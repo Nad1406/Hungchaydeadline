@@ -1,0 +1,41 @@
+{
+  "name": "hung-chay-deadline",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Hưng Chạy Deadline — Game kinh dị tâm lý 3D góc nhìn thứ nhất phong cách PSX Pixel (Three.js + Custom GLSL + 3D HRTF Web Audio)",
+  "author": {
+    "name": "NAD1406",
+    "url": "https://github.com/Nad1406"
+  },
+  "license": "MIT",
+  "homepage": "https://nad1406.github.io/Hungchaydeadline/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nad1406/Hungchaydeadline.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Nad1406/Hungchaydeadline/issues"
+  },
+  "keywords": [
+    "threejs",
+    "webgl",
+    "psx-horror",
+    "psychological-horror",
+    "pixel-horror",
+    "web-audio-api",
+    "glsl-shader",
+    "vietnamese-game",
+    "vite"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.170.0"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0"
+  }
+}

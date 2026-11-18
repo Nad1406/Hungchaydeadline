@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Hưng Chạy Deadline — Game kinh dị tâm lý 3D góc nhìn thứ nhất phong cách PSX Pixel lấy cảm hứng từ sinh viên VN-UK chạy đồ án đêm khuya.">
+  <meta name="author" content="NAD1406">
+  <title>HƯNG CHẠY DEADLINE | Psychological Pixel Horror (VN-UK)</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+  <main id="game-root">
+    <!-- 3D PSX WebGL Canvas Container -->
+    <div id="canvas-container" aria-label="Khung cảnh 3D phòng trọ Nguyễn Tuấn Hưng"></div>
+
+    <!-- =================================================================== -->
+    <!-- TITLE SCREEN OVERLAY                                                -->
+    <!-- =================================================================== -->
+    <section id="title-screen" class="title-overlay" aria-labelledby="game-main-title">
+      <div class="title-panel">
+        <div class="brand-header">
+          <img
+            src="/assets/vnuk_logo.png"
+            alt="Logo Viện Nghiên cứu và Đào tạo Việt - Anh VN-UK"
+            width="138"
+            height="90"
+            fetchpriority="high"
+            class="vnuk-badge"
+          >
+          <img
+            src="/assets/hung_portrait_normal.png"
+            alt="Chân dung pixel Nguyễn Tuấn Hưng"
+            width="90"
+            height="90"
+            fetchpriority="high"
+            class="hung-badge"
+          >
+        </div>
+
+        <p class="horror-tag">PSX PSYCHOLOGICAL HORROR • PHÒNG TRỌ 404</p>
+        <h1 id="game-main-title" class="glitch-title">HƯNG CHẠY DEADLINE</h1>
+        <p class="subtitle">
+          Sinh viên: <strong>Nguyễn Tuấn Hưng (2006)</strong> — Lớp <strong>24SE1</strong> • <strong>VN-UK</strong><br>
+          Ngành Khoa học máy tính (CN Công nghệ phần mềm) • Hạn nộp: <strong>04:00 SÁNG</strong>
+        </p>
+
+        <!-- 3-Level Difficulty Picker (Clean, No Mode Descriptions!) -->
+        <div class="difficulty-box" role="group" aria-label="Chọn độ khó trò chơi">
+          <div class="diff-header">ĐỘ KHÓ:</div>
+          <div class="diff-buttons">
+            <button type="button" class="diff-btn" data-diff="easy">DỄ</button>
+            <button type="button" class="diff-btn active" data-diff="normal">VỪA</button>
+            <button type="button" class="diff-btn" data-diff="hard">KHÓ</button>
+          </div>
+        </div>
+
+        <div class="menu-actions">
+          <button type="button" id="btn-start-game" class="psx-btn primary">
+            ▶ BẮT ĐẦU CA ĐÊM (01:00 SA)
+          </button>
+          <button type="button" id="btn-open-story" class="psx-btn">
+            📖 CỐT TRUYỆN &amp; HƯỚNG DẪN CHƠI
+          </button>
+          <button type="button" id="btn-open-settings" class="psx-btn">
+            ⚙ CÀI ĐẶT
+          </button>
+        </div>
+
+        <p class="headphone-note">
+          🎧 Nhấn <strong>[ESC]</strong> trong game để mở Cài đặt • <strong>Nút Giữa Chuột</strong> để Bật/Tắt trỏ chuột.
+        </p>
+      </div>
+
+      <!-- Creator Signature Badge -->
+      <a
+        href="https://github.com/Nad1406"
+        target="_blank"
+        rel="noopener noreferrer"
+        id="creator-signature"
+        class="creator-signature"
+      >
+        ✦ By <strong>NAD1406</strong> • GitHub ↗
+      </a>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- IN-GAME RETRO VHS / PSX HUD (Clean: No Guide/Settings Buttons!)     -->
+    <!-- =================================================================== -->
+    <header id="hud-top" class="hud-top" hidden>
+      <div class="vhs-status">
+        <div class="rec-row">
+          <span class="rec-dot" aria-hidden="true"></span>
+          <span id="hud-clock">REC • 01:00 SA</span>
+          <span class="sep">|</span>
+          <span id="hud-diff-badge" class="diff-tag">ĐỘ KHÓ: VỪA</span>
+        </div>
+        <div class="deadline-bar-wrap">
+          <div class="deadline-label-row">
+            <span id="hud-progress-label">TIẾN ĐỘ ĐỒ ÁN &amp; BÁO CÁO: 0%</span>
+          </div>
+          <div class="deadline-track" id="hud-progress-track" style="--progress-pct: 0%;">
+            <div class="deadline-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hud-right-stack">
+        <div class="quick-controls">
+          <span id="hud-cursor-badge" class="hud-cursor-tag">
+            [ESC] Cài đặt • 🖱 [Chuột Giữa] Hiện chuột
+          </span>
+        </div>
+
+        <!-- Active Supernatural Tasks with Countdown Timers! -->
+        <ul id="anomaly-hints" class="anomaly-list" aria-live="polite"></ul>
+      </div>
+    </header>
+
+    <!-- Center Pixel Reticle & Contextual Interaction Prompt -->
+    <div id="hud-center" class="hud-center" hidden>
+      <div id="reticle" class="reticle" aria-hidden="true"></div>
+      <div id="interact-prompt" class="interact-prompt" hidden></div>
+    </div>
+
+    <!-- Seated Coding [A]/[D] Spam Strip -->
+    <div id="seated-bar" class="seated-bar" hidden>
+      <div class="key-spam-pill">
+        <span>SPAM PHÍM CHẠY ĐỒ ÁN:</span>
+        <kbd id="keycap-a" class="keycap">A</kbd>
+        <kbd id="keycap-d" class="keycap">D</kbd>
+        <span class="sep">|</span>
+        <span><strong>[Q]</strong> Rời ghế</span>
+        <span class="sep">|</span>
+        <span><strong>[ESC]</strong> Cài đặt</span>
+      </div>
+    </div>
+
+    <!-- Standing Controls Hint Strip -->
+    <div id="standing-bar" class="standing-bar" hidden>
+      <span><strong>[WASD]</strong> Di chuyển</span>
+      <span><strong>[Chuột]</strong> Xoay góc nhìn</span>
+      <span><strong>[E]</strong> Tương tác / Dọn dẹp</span>
+      <span><strong>[F]</strong> Đèn điện thoại</span>
+      <span><strong>[Q]</strong> Ngồi lại ghế</span>
+      <span><strong>[ESC]</strong> Cài đặt</span>
+    </div>
+
+    <!-- Door Frosted Glass Peephole Vignette -->
+    <div id="door-vignette" class="door-vignette" hidden>
+      <div class="door-vignette-caption">
+        ĐANG NHÌN QUA Ô KÍNH CỬA CHÍNH RA HÀNH LANG • Nhấn <strong>[Q]</strong> hoặc <strong>[E]</strong> để lùi lại
+      </div>
+    </div>
+
+    <!-- Bad Parenting / Experiment Groceries Style Pixel Portrait Dialogue Box -->
+    <section id="dialogue-box" class="dialogue-box" data-mood="normal" aria-live="polite" hidden>
+      <div class="portrait-frame">
+        <img
+          id="dialogue-portrait"
+          src="/assets/hung_portrait_normal.png"
+          alt="Khuôn mặt pixel của Nguyễn Tuấn Hưng"
+          width="96"
+          height="96"
+        >
+      </div>
+      <div class="dialogue-body">
+        <div id="dialogue-speaker" class="dialogue-speaker">NGUYỄN TUẤN HƯNG (24SE1 • VN-UK)</div>
+        <p id="dialogue-text" class="dialogue-text"></p>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- NATIVE MODAL DIALOGS                                                -->
+    <!-- =================================================================== -->
+
+    <!-- 1. Story & Controls Dialog (Only from Main Menu) -->
+    <dialog id="dialog-story" class="psx-dialog" closedby="any" aria-labelledby="story-dialog-title">
+      <h2 id="story-dialog-title">HỒ SƠ ĐÊM ĐỒ ÁN: NGUYỄN TUẤN HƯNG</h2>
+      <div class="dialog-scroll" id="story-scroll">
+        <div class="id-preview-row">
+          <img
+            src="/assets/vnuk_student_card.png"
+            alt="Thẻ sinh viên VN-UK của Nguyễn Tuấn Hưng sinh năm 2006"
+            width="240"
+            height="150"
+            class="card-img"
+          >
+          <div>
+            <p>
+              <strong>Nguyễn Tuấn Hưng</strong> (sinh năm 2006), sinh viên lớp <strong>24SE1</strong> — chuyên ngành <strong>Công nghệ phần mềm</strong>, ngành <strong>Khoa học máy tính</strong> tại <strong>VN-UK (Viện Nghiên cứu và Đào tạo Việt - Anh)</strong>, đã thức trắng 4 đêm ròng rã dưới ánh đèn treo vàng của phòng trọ 404 để kịp hoàn thành Đồ án &amp; Báo cáo trước <strong>04:00 sáng</strong>.
+            </p>
+            <p>
+              Mỗi hiện tượng siêu nhiên xảy ra trong phòng đều có <strong>đồng hồ đếm ngược giới hạn thời gian</strong>. Nếu để bất kỳ nhiệm vụ nào hết giờ mà chưa xử lý xong, thực thể trong bóng tối sẽ kết liễu đêm chạy deadline của Hưng!
+            </p>
+          </div>
+        </div>
+
+        <h3>Hướng dẫn điều khiển</h3>
+        <ul>
+          <li><strong>Ngồi chạy Deadline:</strong> Spam liên tục hai phím <strong>[A]</strong> và <strong>[D]</strong> để gõ bàn phím cơ viết Code &amp; Báo cáo VN-UK.</li>
+          <li><strong>Rời ghế &amp; Di chuyển:</strong> Nhấn <strong>[Q]</strong> để đứng dậy, dùng <strong>[W/A/S/D]</strong> di chuyển (<strong>[Shift]</strong> chạy nhanh), <strong>Chuột</strong> xoay góc nhìn, và <strong>[E]</strong> để tương tác xử lý nhiệm vụ trước khi hết giờ.</li>
+          <li><strong>Cài đặt &amp; Trỏ chuột:</strong> Nhấn <strong>[ESC]</strong> để mở Cài đặt hoặc thoát ra Màn hình chính. Nhấn <strong>Nút Giữa Chuột (Con lăn)</strong> để bật/tắt con trỏ chuột.</li>
+        </ul>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="btn-close-story" class="psx-btn primary" autofocus>
+          ĐÃ RÕ — ĐÓNG
+        </button>
+      </div>
+    </dialog>
+
+    <!-- 2. Settings / Pause Dialog (Opened via [ESC] in-game or Title Menu!) -->
+    <dialog id="dialog-settings" class="psx-dialog" closedby="any" aria-labelledby="settings-dialog-title">
+      <h2 id="settings-dialog-title">CÀI ĐẶT ĐỒ HOẠ &amp; ÂM THANH</h2>
+      <div class="settings-grid">
+        <label for="select-quality">Mức độ đồ hoạ (Mượt → Nét):</label>
+        <select id="select-quality">
+          <option value="smooth">Mượt (Nhẹ máy • Pixel cổ điển)</option>
+          <option value="balanced" selected>Cân bằng (Mượt &amp; Rõ vừa phải)</option>
+          <option value="sharp">Nét (Chi tiết rõ ràng)</option>
+          <option value="ultrasharp">Siêu nét (Độ nét tối đa)</option>
+        </select>
+
+        <label for="select-diff-settings">Độ khó:</label>
+        <select id="select-diff-settings">
+          <option value="easy">Dễ</option>
+          <option value="normal" selected>Vừa</option>
+          <option value="hard">Khó</option>
+        </select>
+
+        <label for="input-volume">Âm lượng tổng (Âm thanh 3D &amp; Phím cơ):</label>
+        <input type="range" id="input-volume" min="0" max="100" value="85">
+
+        <label for="check-mute">Tắt toàn bộ âm thanh:</label>
+        <input type="checkbox" id="check-mute">
+
+        <label for="input-sens">Độ nhạy xoay chuột:</label>
+        <input type="range" id="input-sens" min="30" max="200" value="100">
+
+        <label for="check-crt">Hiệu ứng màn hình CRT &amp; Nhiễu băng từ:</label>
+        <input type="checkbox" id="check-crt" checked>
+      </div>
+
+      <div class="settings-footer-row">
+        <a
+          href="https://github.com/Nad1406"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-signature-link"
+        >
+          ✦ Signature: <strong>NAD1406</strong> (GitHub ↗)
+        </a>
+
+        <div class="dialog-actions no-margin">
+          <button type="button" id="btn-settings-mainmenu" class="psx-btn" hidden>
+            🏠 RA MÀN HÌNH CHÍNH
+          </button>
+          <button type="button" id="btn-close-settings" class="psx-btn primary" autofocus>
+            LƯU &amp; TIẾP TỤC
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- 3. VN-UK Student ID Card Close-Up Inspection Dialog -->
+    <dialog id="dialog-card" class="psx-dialog" closedby="any" aria-labelledby="card-dialog-title">
+      <h2 id="card-dialog-title">THẺ SINH VIÊN VN-UK — NGUYỄN TUẤN HƯNG</h2>
+      <div class="card-closeup-wrap">
+        <img
+          src="/assets/vnuk_student_card.png"
+          alt="Thẻ sinh viên trường VN-UK của Nguyễn Tuấn Hưng"
+          width="400"
+          height="250"
+          class="card-closeup-img"
+        >
+        <p class="card-caption">
+          "Cố lên Hưng... Đồ án chuyên ngành Công nghệ phần mềm (Lớp 24SE1 • VN-UK) chỉ còn cách nút Nộp Bài vài tiếng đồng hồ nữa thôi."
+        </p>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="btn-close-card" class="psx-btn primary" autofocus>
+          ĐẶT THẺ XUỐNG BÀN
+        </button>
+      </div>
+    </dialog>
+
+    <!-- 4. Game Over Dialog (Task Time Limit Expired!) -->
+    <dialog id="dialog-gameover" class="psx-dialog gameover-dialog" closedby="none" aria-labelledby="gameover-dialog-title">
+      <h2 id="gameover-dialog-title">✖ THẤT BẠI — KHÔNG KỊP XỬ LÝ HIỆN TƯỢNG!</h2>
+      <div class="dialog-scroll">
+        <div class="id-preview-row">
+          <img
+            src="/assets/hung_portrait_doppel.png"
+            alt="Ác mộng phòng 404 nuốt chửng Nguyễn Tuấn Hưng"
+            width="112"
+            height="112"
+            class="hung-badge gameover-portrait"
+          >
+          <div>
+            <p id="gameover-reason" class="gameover-reason">
+              Bạn đã để quá thời gian giới hạn của nhiệm vụ siêu nhiên!
+            </p>
+            <p>
+              Màn hình máy tính phụt tắt, đồng hồ điểm <strong>04:00 SÁNG</strong> trong tiếng gào rít lạnh buốt. Đồ án VN-UK mãi mãi nằm lại trong căn phòng trọ số 404...
+            </p>
+          </div>
+        </div>
+
+        <dl class="stats-grid">
+          <div>
+            <dt>Độ khó</dt>
+            <dd id="go-stat-diff">VỪA</dd>
+          </div>
+          <div>
+            <dt>Tiến độ Đồ án đạt được</dt>
+            <dd id="go-stat-progress">0%</dd>
+          </div>
+          <div>
+            <dt>Hiện tượng đã dọn dẹp</dt>
+            <dd id="go-stat-resolved">0</dd>
+          </div>
+        </dl>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="btn-gameover-menu" class="psx-btn">
+          🏠 RA MÀN HÌNH CHÍNH
+        </button>
+        <button type="button" id="btn-gameover-retry" class="psx-btn primary" autofocus>
+          ↻ THỬ LẠI CA ĐÊM NÀY
+        </button>
+      </div>
+    </dialog>
+
+    <!-- 5. Ending Victory / Psychological Horror Reveal Dialog -->
+    <dialog id="dialog-ending" class="psx-dialog ending-dialog" closedby="none" aria-labelledby="ending-dialog-title">
+      <h2 id="ending-dialog-title">✔ ĐÃ NỘP ĐỒ ÁN THÀNH CÔNG — 03:59:58 SA</h2>
+      <div class="dialog-scroll">
+        <div class="id-preview-row">
+          <img
+            src="/assets/hung_portrait_normal.png"
+            alt="Nguyễn Tuấn Hưng vượt qua đêm chạy deadline"
+            width="112"
+            height="112"
+            class="hung-badge"
+          >
+          <div>
+            <p class="ending-lead">
+              Ánh bình minh đầu tiên chiếu qua khung cửa sổ sắt phòng 404. Dòng chữ
+              <strong>"NỘP BÀI THÀNH CÔNG — VN-UK LMS"</strong> sáng rực trên màn hình máy tính!
+            </p>
+            <p>
+              Tiếng gõ cửa, tiếng thì thầm sau gáy, và cả gương mặt biến dạng trong gương lập tức tan biến theo màn sương lạnh. Hưng đã chiến thắng cả nỗi kinh hoàng siêu nhiên lẫn áp lực deadline!
+            </p>
+            <p class="ending-twist">
+              ...Khoan đã. Trong file video <code>Webcam_Demo_TuanHung.mp4</code> vừa gửi lên trường VN-UK, ở giây 03:14... có một bàn tay trắng bệch đặt nhẹ lên vai áo đồng phục VN-UK của Hưng khi cậu đang gõ phím.
+            </p>
+          </div>
+        </div>
+
+        <dl class="stats-grid">
+          <div>
+            <dt>Độ khó hoàn thành</dt>
+            <dd id="stat-diff">VỪA</dd>
+          </div>
+          <div>
+            <dt>Hiện tượng siêu nhiên đã dọn dẹp</dt>
+            <dd id="stat-resolved">0</dd>
+          </div>
+          <div>
+            <dt>Số nhịp gõ phím [A]/[D]</dt>
+            <dd id="stat-typed">0</dd>
+          </div>
+        </dl>
+      </div>
+      <div class="settings-footer-row">
+        <a
+          href="https://github.com/Nad1406"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-signature-link"
+        >
+          ✦ A Game by <strong>NAD1406</strong> • GitHub ↗
+        </a>
+        <div class="dialog-actions no-margin">
+          <button type="button" id="btn-ending-menu" class="psx-btn">
+            🏠 RA MÀN HÌNH CHÍNH
+          </button>
+          <button type="button" id="btn-play-again" class="psx-btn primary" autofocus>
+            ↻ CHƠI LẠI CA ĐÊM KHÁC
+          </button>
+        </div>
+      </div>
+    </dialog>
+  </main>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
