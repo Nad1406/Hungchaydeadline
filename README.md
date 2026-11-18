@@ -9,8 +9,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e.svg)](./LICENSE)
 [![Author: NAD1406](https://img.shields.io/badge/By-NAD1406-f59e0b?logo=github)](https://github.com/Nad1406)
 
-🔗 **Chơi trực tuyến (GitHub Pages):** [https://nad1406.github.io/Hungchaydeadline/](https://nad1406.github.io/Hungchaydeadline/)  
-📦 **Mã nguồn (GitHub Repo):** [https://github.com/Nad1406/Hungchaydeadline](https://github.com/Nad1406/Hungchaydeadline)
+📦 **Mã nguồn (GitHub Repo):** [https://github.com/Nad1406/Hungchaydeadline](https://github.com/Nad1406/Hungchaydeadline)  
+▲ **Nền tảng Deploy:** Vercel (`Vite` Static Build)
 
 ---
 
@@ -72,8 +72,6 @@ Không có thanh máu hay vũ khí — cách duy nhất để sống sót là **
 
 ```text
 Hungchaydeadline/
-├── .github/workflows/
-│   └── deploy.yml                  # CI/CD tự động build & deploy lên GitHub Pages
 ├── public/
 │   ├── favicon.svg                 # Biểu tượng tab trình duyệt phong cách Pixel
 │   └── assets/                     # Chân dung pixel nhân vật, thẻ SV & khung bằng VN-UK
@@ -98,7 +96,8 @@ Hungchaydeadline/
 │   └── main.js                     # Khởi tạo Three.js, vòng lặp chính & quản lý Input/UI
 ├── index.html                      # Khung giao diện chính & các hộp thoại native <dialog>
 ├── package.json                    # Khai báo thư viện (Three.js + Vite) & scripts
-├── vite.config.js                  # Cấu hình đóng gói Vite (hỗ trợ đường dẫn tương đối)
+├── vercel.json                     # Cấu hình build & deploy trên Vercel
+├── vite.config.js                  # Cấu hình đóng gói Vite
 └── LICENSE                         # Giấy phép mã nguồn mở MIT
 ```
 ---
