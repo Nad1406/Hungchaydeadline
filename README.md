@@ -101,41 +101,6 @@ Hungchaydeadline/
 ├── vite.config.js                  # Cấu hình đóng gói Vite (hỗ trợ đường dẫn tương đối)
 └── LICENSE                         # Giấy phép mã nguồn mở MIT
 ```
-
----
-
-## 🚀 Hướng dẫn Cài đặt & Chạy trên máy (Local Development)
-
-### Yêu cầu hệ thống
-- **Node.js** phiên bản `18.0+` (khuyến nghị `Node.js 20 LTS`) và `npm`.
-
-### Các bước thực hiện
-
-```bash
-# 1. Clone repository về máy
-git clone https://github.com/Nad1406/Hungchaydeadline.git
-cd Hungchaydeadline
-
-# 2. Cài đặt các gói phụ thuộc
-npm install
-
-# 3. Khởi chạy máy chủ phát triển (Mở tại http://localhost:5173)
-npm run dev
-```
-
-### Đóng gói bản Production
-```bash
-npm run build
-npm run preview
-```
-
-### 🌐 Kích hoạt chơi trực tuyến trên GitHub Pages
-Dự án đã tích hợp sẵn workflow tự động tại `.github/workflows/deploy.yml`:
-1. Sau khi `git push` code lên nhánh `main` của repo `Hungchaydeadline`.
-2. Truy cập **Settings** → **Pages** trên GitHub repo.
-3. Tại mục **Build and deployment** → **Source**, chọn **`GitHub Actions`**.
-4. Chờ khoảng 30 giây để Action chạy xong, game sẽ tự động phát hành tại: `https://nad1406.github.io/Hungchaydeadline/`.
-
 ---
 
 ## 👤 Tác giả (Author)
