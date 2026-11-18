@@ -106,12 +106,6 @@
       </div>
 
       <div class="hud-right-stack">
-        <div class="quick-controls">
-          <span id="hud-cursor-badge" class="hud-cursor-tag">
-            [ESC] Cài đặt • 🖱 [Chuột Giữa] Hiện chuột
-          </span>
-        </div>
-
         <!-- Active Supernatural Tasks with Countdown Timers! -->
         <ul id="anomaly-hints" class="anomaly-list" aria-live="polite"></ul>
       </div>
@@ -212,8 +206,22 @@
 
     <!-- 2. Settings / Pause Dialog (Opened via [ESC] in-game or Title Menu!) -->
     <dialog id="dialog-settings" class="psx-dialog" closedby="any" aria-labelledby="settings-dialog-title">
-      <h2 id="settings-dialog-title">CÀI ĐẶT ĐỒ HOẠ &amp; ÂM THANH</h2>
+      <h2 id="settings-dialog-title">CÀI ĐẶT HIỂN THỊ, ĐỒ HOẠ &amp; ÂM THANH</h2>
       <div class="settings-grid">
+        <fieldset class="display-mode-fieldset">
+          <legend class="settings-legend">Chế độ hiển thị (Windowed / Fullscreen):</legend>
+          <div class="display-mode-options">
+            <div class="radio-option">
+              <input type="radio" id="radio-display-fullscreen" name="display_mode" value="fullscreen" checked>
+              <label for="radio-display-fullscreen">Toàn màn hình (Fullscreen)</label>
+            </div>
+            <div class="radio-option">
+              <input type="radio" id="radio-display-windowed" name="display_mode" value="windowed">
+              <label for="radio-display-windowed">Cửa sổ (Windowed)</label>
+            </div>
+          </div>
+        </fieldset>
+
         <label for="select-quality">Mức độ đồ hoạ (Mượt → Nét):</label>
         <select id="select-quality">
           <option value="smooth">Mượt (Nhẹ máy • Pixel cổ điển)</option>

@@ -39,10 +39,13 @@ class HungDeadlineGame {
     this.titleScreenEl = document.getElementById('title-screen');
     this.diffBtns = Array.from(document.querySelectorAll('.diff-btn'));
     this.selectDiffSettingsEl = document.getElementById('select-diff-settings');
+    this.radioFullscreenEl = document.getElementById('radio-display-fullscreen');
+    this.radioWindowedEl = document.getElementById('radio-display-windowed');
     this.btnSettingsMainMenu = document.getElementById('btn-settings-mainmenu');
     this.btnCloseSettings = document.getElementById('btn-close-settings');
     this.checkMuteEl = document.getElementById('check-mute');
 
+    this.preferFullscreen = true;
     this._intentionalUnlock = false;
     this._lastSettingsOpenTime = 0;
 
@@ -50,7 +53,6 @@ class HungDeadlineGame {
     this.hudCenterEl = document.getElementById('hud-center');
     this.hudClockEl = document.getElementById('hud-clock');
     this.hudDiffBadgeEl = document.getElementById('hud-diff-badge');
-    this.hudCursorBadgeEl = document.getElementById('hud-cursor-badge');
     this.hudProgressLabelEl = document.getElementById('hud-progress-label');
     this.hudProgressTrackEl = document.getElementById('hud-progress-track');
     this.anomalyHintsEl = document.getElementById('anomaly-hints');
@@ -200,7 +202,7 @@ class HungDeadlineGame {
   }
 
   // =========================================================================
-  // CURSOR VISIBILITY & FULLSCREEN MANAGEMENT
+  // CURSOR VISIBILITY & FULLSCREEN / WINDOWED MANAGEMENT
   // =========================================================================
   _requestFullscreenSafe() {
     try {
@@ -211,6 +213,44 @@ class HungDeadlineGame {
     } catch {
       // Ignore in restricted environments
     }
+  }
+
+  _exitFullscreenSafe() {
+    try {
+      if (document.fullscreenElement && document.exitFullscreen) {
+        this._intentionalUnlock = true;
+        const p = document.exitFullscreen();
+        if (p && typeof p.catch === 'function') p.catch(() => {});
+        setTimeout(() => {
+          this._intentionalUnlock = false;
+        }, 180);
+      }
+    } catch {
+      // Ignore in restricted environments
+    }
+  }
+
+  _syncDisplayModeUI() {
+    if (this.radioFullscreenEl) {
+      this.radioFullscreenEl.checked = this.preferFullscreen;
+    }
+    if (this.radioWindowedEl) {
+      this.radioWindowedEl.checked = !this.preferFullscreen;
+    }
+  }
+
+  _applyDisplayMode() {
+    if (this.preferFullscreen) {
+      this._requestFullscreenSafe();
+    } else {
+      this._exitFullscreenSafe();
+    }
+  }
+
+  _setDisplayMode(fullscreen) {
+    this.preferFullscreen = Boolean(fullscreen);
+    this._syncDisplayModeUI();
+    this._applyDisplayMode();
   }
 
   _safeRequestPointerLock(el) {
@@ -241,20 +281,15 @@ class HungDeadlineGame {
       this.lastClientX = null;
       this.lastClientY = null;
       this._safeRequestPointerLock(this.renderer.domElement);
-      if (this.hudCursorBadgeEl) {
-        this.hudCursorBadgeEl.textContent = '[ESC] Cài đặt • 🖱 [Chuột Giữa] Hiện chuột';
-      }
     } else {
       document.body.classList.remove('cursor-hidden');
       this._safeExitPointerLock();
-      if (this.hudCursorBadgeEl) {
-        this.hudCursorBadgeEl.textContent = '[ESC] Cài đặt • 🖱 Chuột: HIỆN (Chuột Giữa để ẩn)';
-      }
     }
   }
 
   _openSettingsModal() {
     this._lastSettingsOpenTime = performance.now();
+    this._syncDisplayModeUI();
     if (this.btnSettingsMainMenu) {
       this.btnSettingsMainMenu.hidden = this.mode !== 'playing';
     }
@@ -287,7 +322,7 @@ class HungDeadlineGame {
     // Title Screen Buttons (Normal Mouse Click!)
     document.getElementById('btn-start-game').addEventListener('click', () => {
       this.audio.init();
-      this._requestFullscreenSafe();
+      this._applyDisplayMode();
       this.startNewNight();
     });
 
@@ -307,6 +342,9 @@ class HungDeadlineGame {
     });
     this.btnCloseSettings.addEventListener('click', () => {
       this.dialogSettings.close();
+      if (this.mode === 'playing') {
+        this._applyDisplayMode();
+      }
     });
     this.btnSettingsMainMenu.addEventListener('click', () => {
       this._closingToMainMenu = true;
@@ -361,7 +399,7 @@ class HungDeadlineGame {
     // Game Over & Victory Buttons
     document.getElementById('btn-gameover-retry').addEventListener('click', () => {
       this.dialogGameOver.close();
-      this._requestFullscreenSafe();
+      this._applyDisplayMode();
       this.startNewNight();
     });
 
@@ -372,7 +410,7 @@ class HungDeadlineGame {
 
     document.getElementById('btn-play-again').addEventListener('click', () => {
       this.dialogEnding.close();
-      this._requestFullscreenSafe();
+      this._applyDisplayMode();
       this.startNewNight();
     });
 
@@ -381,7 +419,37 @@ class HungDeadlineGame {
       this.returnToTitleMenu();
     });
 
-    // Settings Controls (Graphics Quality Smooth -> Sharp, Difficulty, Volume, Mute, Sensitivity, CRT)
+    // Settings Controls (Display Mode Fullscreen/Windowed, Graphics Quality, Difficulty, Volume, Mute, Sensitivity, CRT)
+    this.radioFullscreenEl?.addEventListener('change', () => {
+      if (this.radioFullscreenEl.checked) {
+        this._setDisplayMode(true);
+      }
+    });
+    this.radioFullscreenEl?.addEventListener('click', () => {
+      if (this.radioFullscreenEl.checked && !document.fullscreenElement) {
+        this._requestFullscreenSafe();
+      }
+    });
+
+    this.radioWindowedEl?.addEventListener('change', () => {
+      if (this.radioWindowedEl.checked) {
+        this._setDisplayMode(false);
+      }
+    });
+    this.radioWindowedEl?.addEventListener('click', () => {
+      if (this.radioWindowedEl.checked && document.fullscreenElement) {
+        this._exitFullscreenSafe();
+      }
+    });
+
+    for (const box of document.querySelectorAll('.radio-option')) {
+      box.addEventListener('click', (e) => {
+        if (e.target === box) {
+          box.querySelector('input[type="radio"]')?.click();
+        }
+      });
+    }
+
     document.getElementById('select-quality').addEventListener('change', (e) => {
       this._applyQualityPreset(e.target.value);
     });
@@ -490,7 +558,7 @@ class HungDeadlineGame {
 
       if (code === 'F11') {
         e.preventDefault();
-        this._requestFullscreenSafe();
+        this._setDisplayMode(!document.fullscreenElement);
         return;
       }
 
