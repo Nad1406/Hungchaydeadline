@@ -9,7 +9,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e.svg)](./LICENSE)
 [![Author: NAD1406](https://img.shields.io/badge/By-NAD1406-f59e0b?logo=github)](https://github.com/Nad1406)
 
-📦 **Mã nguồn (GitHub Repo):** [https://github.com/Nad1406/Hungchaydeadline](https://github.com/Nad1406/Hungchaydeadline)  
 ▲ **Nền tảng Deploy:** Vercel (`Vite` Static Build)
 
 ---
